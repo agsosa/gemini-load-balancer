@@ -18,3 +18,4 @@ temp/
 tmp/
 data/
 bun.lock
+.next
