@@ -1,5 +1,5 @@
 {
-  "name": "google-gemini-proxy-server",
+  "name": "gemini-load-balancer",
   "version": "1.0.0",
   "type": "module",
   "main": "add-key.js",

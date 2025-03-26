@@ -4,7 +4,7 @@ import { logKeyEvent, logError } from './logger.js';
 class KeyManager {
   constructor() {
     this.currentKey = null;
-    this.rotationRequestCount = parseInt(process.env.KEY_ROTATION_REQUEST_COUNT || '1000'); // Default to 1000 requests
+    this.rotationRequestCount = parseInt(process.env.KEY_ROTATION_REQUEST_COUNT || '5'); // Default to 5 requests
     this.requestCounter = 0;
   }
 
