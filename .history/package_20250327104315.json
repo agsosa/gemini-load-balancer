@@ -3,8 +3,9 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "node scripts/dev.js",
-    "start": "node scripts/start.js",
+    "dev": "next dev -p %npm_config_port",
+    "build": "next build",
+    "start": "next start -p $(node scripts/port.js)",
     "lint": "next lint"
   },
   "dependencies": {
