@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import axios from 'axios';
 import keyManager from '@/lib/services/keyManager';
-import { logError } from '@/lib/services/logger';
+import { logError, requestLogger } from '@/lib/services/logger';
+import { v4 as uuidv4 } from 'uuid';
 
 // Helper function to handle streaming response
 async function handleStreamingResponse(axiosResponse: any, res: any) {
@@ -27,10 +28,22 @@ async function handleStreamingResponse(axiosResponse: any, res: any) {
 export async function POST(req: NextRequest) {
   const maxRetries = 3;
   let retryCount = 0;
+  const requestId = uuidv4();
+  const startTime = Date.now();
   
   // Parse the request body
   const body = await req.json();
   const isStreaming = body?.stream === true;
+
+  // Log incoming request
+  requestLogger.info('Incoming Request', {
+    requestId,
+    path: '/api/v1/chat/completions',
+    method: 'POST',
+    body,
+    model: body?.model,
+    streaming: isStreaming
+  });
 
   while (retryCount < maxRetries) {
     try {
@@ -58,6 +71,16 @@ export async function POST(req: NextRequest) {
       // Mark the successful use of the key
       await keyManager.markKeySuccess();
 
+      // Log successful response
+      const responseTime = Date.now() - startTime;
+      requestLogger.info('Outgoing Response', {
+        requestId,
+        statusCode: 200,
+        responseTime,
+        model: body?.model,
+        streaming: isStreaming
+      });
+
       // Handle streaming response differently
       if (isStreaming) {
         return handleStreamingResponse(response, null);
@@ -75,9 +98,12 @@ export async function POST(req: NextRequest) {
 
       logError(error, { 
         context: 'Chat completions',
+        requestId,
         retryCount,
         statusCode: error.response?.status,
-        streaming: isStreaming
+        streaming: isStreaming,
+        responseTime: Date.now() - startTime,
+        model: body?.model
       });
 
       // For non-streaming requests, send error response
