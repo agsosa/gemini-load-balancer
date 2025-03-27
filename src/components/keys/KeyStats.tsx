@@ -25,7 +25,8 @@ import {
   AlertDialogHeader,
   AlertDialogContent,
   AlertDialogOverlay,
-  useDisclosure
+  useDisclosure,
+  Switch
 } from '@chakra-ui/react';
 import { FiRefreshCw, FiTrash2 } from 'react-icons/fi';
 import { useRef } from 'react';
@@ -44,6 +45,7 @@ export default function KeyStats() {
   const [keys, setKeys] = useState<ApiKey[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedKeyId, setSelectedKeyId] = useState<string | null>(null);
+  const [isToggling, setIsToggling] = useState<{[key: string]: boolean}>({});
   const { isOpen, onOpen, onClose } = useDisclosure();
   const cancelRef = useRef<HTMLButtonElement>(null);
   const toast = useToast();
@@ -80,9 +82,14 @@ export default function KeyStats() {
 
   // Function to get status badge
   const getStatusBadge = (key: ApiKey) => {
+    if (!key.isActive) {
+      return <Badge colorScheme="gray">Disabled</Badge>;
+    }
+    
     if (key.rateLimitResetAt && new Date(key.rateLimitResetAt) > new Date()) {
       return <Badge colorScheme="yellow">Rate Limited</Badge>;
     }
+    
     return <Badge colorScheme="green">Active</Badge>;
   };
 
@@ -131,6 +138,45 @@ export default function KeyStats() {
     }
   };
 
+  // Function to toggle key active status
+  const handleToggleKey = async (keyId: string, currentStatus: boolean) => {
+    setIsToggling(prev => ({ ...prev, [keyId]: true }));
+    
+    try {
+      const response = await fetch(`/api/admin/keys/${keyId}`, {
+        method: 'PATCH',
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to update key status');
+      }
+      
+      const data = await response.json();
+      
+      toast({
+        title: 'Success',
+        description: `API key ${currentStatus ? 'disabled' : 'enabled'} successfully`,
+        status: 'success',
+        duration: 3000,
+        isClosable: true,
+      });
+      
+      // Refresh the keys list
+      fetchKeys();
+    } catch (error) {
+      console.error('Error toggling key status:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to update API key status',
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+      });
+    } finally {
+      setIsToggling(prev => ({ ...prev, [keyId]: false }));
+    }
+  };
+
   return (
     <Box>
       <Flex justify="space-between" align="center" mb={4}>
@@ -156,6 +202,7 @@ export default function KeyStats() {
               <Th>Last Used</Th>
               <Th>Requests</Th>
               <Th>Failures</Th>
+              <Th>Enabled</Th>
               <Th>Actions</Th>
             </Tr>
           </Thead>
@@ -168,12 +215,13 @@ export default function KeyStats() {
                   <Td><Skeleton height="20px" width="150px" /></Td>
                   <Td><Skeleton height="20px" width="60px" /></Td>
                   <Td><Skeleton height="20px" width="60px" /></Td>
+                  <Td><Skeleton height="20px" width="60px" /></Td>
                   <Td><Skeleton height="20px" width="100px" /></Td>
                 </Tr>
               ))
             ) : keys.length === 0 ? (
               <Tr>
-                <Td colSpan={6} textAlign="center" py={4}>
+                <Td colSpan={7} textAlign="center" py={4}>
                   No API keys found. Add a key to get started.
                 </Td>
               </Tr>
@@ -185,6 +233,14 @@ export default function KeyStats() {
                   <Td>{formatDate(key.lastUsed)}</Td>
                   <Td>{key.requestCount}</Td>
                   <Td>{key.failureCount}</Td>
+                  <Td>
+                    <Switch 
+                      isChecked={key.isActive}
+                      isDisabled={isToggling[key._id]}
+                      onChange={() => handleToggleKey(key._id, key.isActive)}
+                      size="sm"
+                    />
+                  </Td>
                   <Td>
                     <HStack spacing={2}>
                       <Tooltip label="Delete Key">
