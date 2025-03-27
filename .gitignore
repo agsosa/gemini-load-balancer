@@ -19,3 +19,4 @@ tmp/
 data/
 bun.lock
 .next
+.history
