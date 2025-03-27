@@ -76,7 +76,7 @@ To use this load balancer as an API service for your applications:
 1. Start the application and access the UI at http://localhost:4269
 2. Go to the "API Keys" section and add your Gemini API keys through the UI
 3. In your client application, configure the following:
-   - Base URL: `http://localhost:4269` (or your deployed URL)
+   - Base URL: `http://localhost:4269/api/v1` (or your deployed URL)
    - API Key: Can be any string (the load balancer ignores this and uses its managed keys)
    - Model: Will be automatically populated from the available Gemini models
 
