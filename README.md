@@ -3,7 +3,7 @@
 A modern NextJS application that serves as a proxy server for the Google Gemini API, with key management, load balancing, and a beautiful UI. This application allows you to efficiently manage multiple Gemini API keys, automatically rotate between them to avoid rate limits, and monitor your API usage with detailed statistics.
 
 
-![Gemini Load Balancer](https://via.placeholder.com/800x400?text=Gemini+Load+Balancer)
+![Gemini Load Balancer](https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ftse2.mm.bing.net%2Fth%3Fid%3DOIP.8qJFfRHJ4w1imQm4ATTdcAHaFl%26pid%3DApi&f=1&ipt=967751466c9cf44b0aa649a4db4edd75c0fba31eeac5b92c314a7c161ab215a1&ipo=images)
 
 Thanks to @SannidhyaSah for his contribution in this application 
 
