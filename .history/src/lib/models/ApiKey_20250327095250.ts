@@ -102,25 +102,6 @@ export class ApiKey implements ApiKeyData {
     return this;
   }
 
-  async delete(): Promise<void> {
-    const keys = await ApiKey.#readKeys();
-    const filteredKeys = keys.filter(k => k._id !== this._id);
-    await ApiKey.#writeKeys(filteredKeys);
-  }
-
-  static async deleteById(id: string): Promise<boolean> {
-    const keys = await this.#readKeys();
-    const initialLength = keys.length;
-    const filteredKeys = keys.filter(k => k._id !== id);
-    
-    if (filteredKeys.length === initialLength) {
-      return false; // No key was deleted
-    }
-    
-    await this.#writeKeys(filteredKeys);
-    return true;
-  }
-
   static async #readKeys(): Promise<ApiKeyData[]> {
     try {
       await this.#ensureDataDir();

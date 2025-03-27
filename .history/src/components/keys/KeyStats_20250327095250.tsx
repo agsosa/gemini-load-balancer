@@ -27,7 +27,7 @@ import {
   AlertDialogOverlay,
   useDisclosure
 } from '@chakra-ui/react';
-import { FiRefreshCw, FiTrash2 } from 'react-icons/fi';
+import { FiRefreshCw, FiTrash2, FiEdit } from 'react-icons/fi';
 import { useRef } from 'react';
 
 interface ApiKey {
@@ -80,9 +80,14 @@ export default function KeyStats() {
 
   // Function to get status badge
   const getStatusBadge = (key: ApiKey) => {
+    if (!key.isActive) {
+      return <Badge colorScheme="red">Inactive</Badge>;
+    }
+    
     if (key.rateLimitResetAt && new Date(key.rateLimitResetAt) > new Date()) {
       return <Badge colorScheme="yellow">Rate Limited</Badge>;
     }
+    
     return <Badge colorScheme="green">Active</Badge>;
   };
 
@@ -109,7 +114,7 @@ export default function KeyStats() {
       
       toast({
         title: 'Success',
-        description: 'API key deleted successfully',
+        description: 'API key deactivated successfully',
         status: 'success',
         duration: 3000,
         isClosable: true,
@@ -121,7 +126,7 @@ export default function KeyStats() {
       console.error('Error deleting key:', error);
       toast({
         title: 'Error',
-        description: 'Failed to delete API key',
+        description: 'Failed to deactivate API key',
         status: 'error',
         duration: 5000,
         isClosable: true,
@@ -218,11 +223,11 @@ export default function KeyStats() {
         <AlertDialogOverlay>
           <AlertDialogContent>
             <AlertDialogHeader fontSize="lg" fontWeight="bold">
-              Delete API Key
+              Deactivate API Key
             </AlertDialogHeader>
 
             <AlertDialogBody>
-              Are you sure you want to delete this API key? This action cannot be undone.
+              Are you sure you want to deactivate this API key? This action cannot be undone.
             </AlertDialogBody>
 
             <AlertDialogFooter>
@@ -230,7 +235,7 @@ export default function KeyStats() {
                 Cancel
               </Button>
               <Button colorScheme="red" onClick={handleDeleteKey} ml={3}>
-                Delete
+                Deactivate
               </Button>
             </AlertDialogFooter>
           </AlertDialogContent>
