@@ -1,7 +1,7 @@
 .aider*
 .env
 node_modules
-logs
+/logs
 npm-debug.log
 yarn-debug.log
 pnpm-lock.yaml
